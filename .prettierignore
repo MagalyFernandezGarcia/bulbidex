@@ -1,0 +1,6 @@
+.next
+out
+build
+src/generated
+pnpm-lock.yaml
+.claude

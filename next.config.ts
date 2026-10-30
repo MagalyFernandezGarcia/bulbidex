@@ -1,4 +1,5 @@
 import type { NextConfig } from "next";
+import "./src/lib/environment";
 
 const nextConfig: NextConfig = {
   cacheComponents: true,

@@ -10,16 +10,24 @@ Next.js 16 (App Router) + React 19 + TypeScript (strict) + Tailwind CSS v4.
 
 ## Commands
 
+- Node **24** (pinned in `.nvmrc` and `engines`) — run `nvm use` in the project
 - Package manager: **pnpm** (never npm/yarn)
 - `pnpm dev` — start the dev server
 - `pnpm build` — production build
-- `pnpm lint` — run ESLint
+- `pnpm lint` / `pnpm lint:fix` — run ESLint (the TypeScript, React, Zod and Prisma rules below are enforced)
+- `pnpm typecheck` — run the TypeScript compiler
+- `pnpm check` — typecheck + lint
+- `pnpm db:migrate` — create and apply a migration (`prisma migrate dev`)
+- `pnpm db:deploy` — apply pending migrations (`prisma migrate deploy`, run automatically by `vercel-build` on deploy)
+- `pnpm db:generate` / `pnpm db:studio` — regenerate the Prisma client / open Prisma Studio
+- Environment variables are validated with Zod in `src/lib/environment.ts` — import `environment` from there instead of reading `process.env` directly, and add every new variable to its schema and to `.env.example`
+- `pnpm format` / `pnpm format:check` — run Prettier (also sorts Tailwind classes)
 - Add shadcn components with `pnpm dlx shadcn@latest add <component>`
 
 ## Project structure
 
 - `src/app/` — routes, layouts and pages (App Router)
-- `src/components/ui/` — shadcn components
+- `src/components/ui/` — shadcn components, kept as generated: exempt from the code style rules below (arrow functions, imports, …) and not linted with them — do not rewrite them
 - `src/components/` — app components
 - Import alias: `@/*` → `./src/*`
 
@@ -68,4 +76,4 @@ Next.js 16 (App Router) + React 19 + TypeScript (strict) + Tailwind CSS v4.
 
 - Do NOT add `Co-Authored-By` lines (or any AI attribution) to commit messages
 - Never commit AI-generated comments — remove all assistant-produced inline comments before committing or opening a PR
-- Run `pnpm lint` and `pnpm build` before committing
+- Run `pnpm check`, `pnpm format:check` and `pnpm build` before committing (CI runs the same on every push and PR)
