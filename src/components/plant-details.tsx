@@ -45,7 +45,7 @@ export const PlantDetails = async ({ params }: PlantDetailsProps) => {
 
       <div className="flex flex-wrap gap-2">
         <Link
-          href={`/calendar?plant=${plant.id}`}
+          href={`/calendar?view=year&plant=${plant.id}`}
           className={buttonVariants({ variant: "outline" })}
         >
           <CalendarDays />

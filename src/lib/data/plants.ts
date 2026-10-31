@@ -1,7 +1,8 @@
 import "server-only";
 import { Prisma } from "@/generated/prisma/client";
-import { addDays, getToday } from "@/lib/care-schedule";
+import { addDays } from "@/lib/care-schedule";
 import { prisma } from "@/lib/prisma";
+import { getRequestToday } from "@/lib/request-today";
 import { requireSession } from "@/lib/session";
 
 const COMPLETION_HISTORY_IN_DAYS = 400;
@@ -19,7 +20,7 @@ const getCareTaskInclude = (today: Date) =>
 
 export const getPlants = async (search?: string) => {
   await requireSession();
-  const today = getToday();
+  const today = await getRequestToday();
   const searchFilter: Prisma.PlantWhereInput = search
     ? {
         OR: [
@@ -40,7 +41,7 @@ export const getPlants = async (search?: string) => {
 
 export const getPlant = async (id: string) => {
   await requireSession();
-  const today = getToday();
+  const today = await getRequestToday();
   const plant = await prisma.plant.findUnique({
     where: { id },
     include: { careTasks: getCareTaskInclude(today) },
