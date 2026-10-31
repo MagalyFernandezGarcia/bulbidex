@@ -2,7 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
-import { z } from "zod";
+import { toFieldErrors, VALIDATION_ERROR_MESSAGE } from "@/lib/form-errors";
 import { deletePlantPhoto, isAllowedPhotoType, uploadPlantPhoto } from "@/lib/photo-storage";
 import { prisma } from "@/lib/prisma";
 import { plantFormSchema } from "@/lib/plant-form-schema";
@@ -23,17 +23,6 @@ const parsePayload = (formData: FormData) => {
     return null;
   }
 };
-
-const toFieldErrors = (error: z.ZodError) => {
-  const fieldErrors: Record<string, string> = {};
-  for (const issue of error.issues) {
-    const path = issue.path.join(".");
-    fieldErrors[path] ??= issue.message;
-  }
-  return fieldErrors;
-};
-
-const VALIDATION_ERROR_MESSAGE = "Certains champs sont à corriger.";
 
 const MAXIMUM_PHOTO_SIZE_IN_BYTES = 3 * 1024 * 1024;
 const MAXIMUM_THUMBNAIL_SIZE_IN_BYTES = 1024 * 1024;
