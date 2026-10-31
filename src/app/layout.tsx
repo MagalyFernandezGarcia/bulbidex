@@ -13,8 +13,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Bulbidex",
-  description: "Bulbidex",
+  title: { default: "Bulbidex", template: "%s · Bulbidex" },
+  description: "Le carnet d'entretien de mon jardin",
 };
 
 const RootLayout = ({ children }: LayoutProps<"/">) => (
