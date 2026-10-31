@@ -2,9 +2,12 @@ import "dotenv/config";
 import { PrismaPg } from "@prisma/adapter-pg";
 import { PrismaClient } from "@/generated/prisma/client";
 import { MonthPart, Recurrence, TaskType } from "@/generated/prisma/enums";
+import { getDatabaseConnectionString } from "@/lib/database-url";
 
 const prisma = new PrismaClient({
-  adapter: new PrismaPg({ connectionString: process.env["DATABASE_URL"] }),
+  adapter: new PrismaPg({
+    connectionString: getDatabaseConnectionString(process.env["DATABASE_URL"] ?? ""),
+  }),
 });
 
 const seed = async () => {
