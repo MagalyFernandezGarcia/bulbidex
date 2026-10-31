@@ -1,10 +1,17 @@
 import { Repeat } from "lucide-react";
 import { Recurrence, TaskType } from "@/generated/prisma/enums";
+import { EditCareTaskDialog } from "@/components/edit-care-task-dialog";
 import { OccurrenceCheckbox } from "@/components/occurrence-checkbox";
 import { TaskTypeBadge } from "@/components/task-type-badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { createDate, getOccurrencesInRange, toDateKey } from "@/lib/care-schedule";
-import { formatDateRange, formatDayMonth, formatPeriod, formatRecurrence } from "@/lib/labels";
+import {
+  formatDateRange,
+  formatDayMonth,
+  formatPeriod,
+  formatRecurrence,
+  getTaskTitle,
+} from "@/lib/labels";
 import { getCurrentOccurrence, isOccurrenceDone, TaskWithCompletions } from "@/lib/task-status";
 
 type CareTaskCardProps = {
@@ -25,9 +32,27 @@ export const CareTaskCard = ({ task, today }: CareTaskCardProps) => {
   return (
     <Card>
       <CardContent className="flex flex-col gap-3">
-        <div className="flex flex-wrap items-center gap-2">
-          <TaskTypeBadge type={task.type} />
-          {task.title && <p className="font-medium">{task.title}</p>}
+        <div className="flex items-start justify-between gap-2">
+          <div className="flex flex-wrap items-center gap-2">
+            <TaskTypeBadge type={task.type} />
+            {task.title && <p className="font-medium">{task.title}</p>}
+          </div>
+          <EditCareTaskDialog
+            careTaskId={task.id}
+            taskTitle={getTaskTitle(task)}
+            initialValues={{
+              key: task.id,
+              type: task.type,
+              title: task.title ?? "",
+              instructions: task.instructions ?? "",
+              startMonth: task.startMonth,
+              startPart: task.startPart,
+              endMonth: task.endMonth,
+              endPart: task.endPart,
+              recurrence: task.recurrence,
+              interval: task.interval,
+            }}
+          />
         </div>
         <p className="flex flex-wrap items-center gap-x-2 text-sm text-muted-foreground">
           <span className="first-letter:uppercase">{formatPeriod(task)}</span>
