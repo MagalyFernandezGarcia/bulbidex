@@ -25,9 +25,11 @@ export const deleteSession = async () => {
   cookieStore.delete(SESSION_COOKIE_NAME);
 };
 
-export const requireSession = async () => {
+export const hasValidSession = async () => {
   const cookieStore = await cookies();
-  if (!(await isValidSessionToken(cookieStore.get(SESSION_COOKIE_NAME)?.value))) {
-    redirect("/login");
-  }
+  return isValidSessionToken(cookieStore.get(SESSION_COOKIE_NAME)?.value);
+};
+
+export const requireSession = async () => {
+  if (!(await hasValidSession())) redirect("/login");
 };

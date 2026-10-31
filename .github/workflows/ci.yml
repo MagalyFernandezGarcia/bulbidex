@@ -12,6 +12,7 @@ jobs:
       DATABASE_URL: postgresql://user:password@localhost:5432/bulbidex
       APP_PASSWORD: ci-password
       SESSION_SECRET: ci-session-secret-of-at-least-32-characters
+      BLOB_READ_WRITE_TOKEN: ci-blob-token
     steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v4

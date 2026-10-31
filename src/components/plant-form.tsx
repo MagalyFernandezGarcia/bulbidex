@@ -7,14 +7,17 @@ import { MonthPart, Recurrence, TaskType } from "@/generated/prisma/enums";
 import { PlantFormState } from "@/actions/plants";
 import { CareTaskDraft, CareTaskFields } from "@/components/care-task-fields";
 import { FormField } from "@/components/form-field";
+import { PhotoField } from "@/components/photo-field";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { PlantFormInput } from "@/lib/plant-form-schema";
+import { preparePlantPhoto } from "@/lib/resize-image";
 
 type PlantFormProps = {
   action: (previousState: PlantFormState, formData: FormData) => Promise<PlantFormState>;
   initialValues: PlantFormInput;
+  initialPhotoUrl?: string | null;
   cancelHref: string;
   submitLabel: string;
 };
@@ -46,7 +49,27 @@ const createEmptyCareTask = (): CareTaskDraft => {
 
 const initialState: PlantFormState = {};
 
-export const PlantForm = ({ action, initialValues, cancelHref, submitLabel }: PlantFormProps) => {
+enum PhotoStatus {
+  Unchanged = "unchanged",
+  Processing = "processing",
+  Selected = "selected",
+  Removed = "removed",
+}
+
+type PhotoState =
+  | { status: PhotoStatus.Unchanged | PhotoStatus.Processing | PhotoStatus.Removed }
+  | { status: PhotoStatus.Selected; photo: Blob; thumbnail: Blob; previewUrl: string };
+
+const getPhotoFileName = (name: string, blob: Blob) =>
+  `${name}.${blob.type === "image/webp" ? "webp" : "jpg"}`;
+
+export const PlantForm = ({
+  action,
+  initialValues,
+  initialPhotoUrl = null,
+  cancelHref,
+  submitLabel,
+}: PlantFormProps) => {
   const [state, formAction, isPending] = useActionState(action, initialState);
   const { careTasks: initialCareTasks, ...initialPlantValues } = initialValues;
   const [plantValues, setPlantValues] = useState(initialPlantValues);
@@ -54,7 +77,61 @@ export const PlantForm = ({ action, initialValues, cancelHref, submitLabel }: Pl
     initialCareTasks.map((task) => ({ ...task, key: task.id ?? crypto.randomUUID() })),
   );
 
+  const [photoState, setPhotoState] = useState<PhotoState>({ status: PhotoStatus.Unchanged });
+  const [photoError, setPhotoError] = useState<string>();
+
   const fieldErrors = state.fieldErrors ?? {};
+  const isPhotoProcessing = photoState.status === PhotoStatus.Processing;
+  const photoPreviewUrl =
+    photoState.status === PhotoStatus.Selected
+      ? photoState.previewUrl
+      : photoState.status === PhotoStatus.Removed
+        ? null
+        : initialPhotoUrl;
+
+  const replacePhotoState = (nextState: PhotoState) =>
+    setPhotoState((previousState) => {
+      if (previousState.status === PhotoStatus.Selected) {
+        URL.revokeObjectURL(previousState.previewUrl);
+      }
+      return nextState;
+    });
+
+  const selectPhoto = async (file: File) => {
+    setPhotoError(undefined);
+    replacePhotoState({ status: PhotoStatus.Processing });
+    try {
+      const { photo, thumbnail } = await preparePlantPhoto(file);
+      replacePhotoState({
+        status: PhotoStatus.Selected,
+        photo,
+        thumbnail,
+        previewUrl: URL.createObjectURL(photo),
+      });
+    } catch {
+      replacePhotoState({ status: PhotoStatus.Unchanged });
+      setPhotoError("Impossible de lire cette image. Essayez une photo au format JPEG ou PNG.");
+    }
+  };
+
+  const removePhoto = () => {
+    setPhotoError(undefined);
+    replacePhotoState({ status: PhotoStatus.Removed });
+  };
+
+  const submit = (formData: FormData) => {
+    if (photoState.status === PhotoStatus.Selected) {
+      formData.set("photo", photoState.photo, getPhotoFileName("photo", photoState.photo));
+      formData.set(
+        "photoThumbnail",
+        photoState.thumbnail,
+        getPhotoFileName("thumbnail", photoState.thumbnail),
+      );
+    } else if (photoState.status === PhotoStatus.Removed && initialPhotoUrl) {
+      formData.set("removePhoto", "true");
+    }
+    formAction(formData);
+  };
   const payload = JSON.stringify({
     ...plantValues,
     careTasks: careTasks.map((task) => ({ ...task, key: undefined })),
@@ -64,11 +141,18 @@ export const PlantForm = ({ action, initialValues, cancelHref, submitLabel }: Pl
     setPlantValues((previousValues) => ({ ...previousValues, [field]: value }));
 
   return (
-    <form action={formAction} className="flex flex-col gap-8">
+    <form action={submit} className="flex flex-col gap-8">
       <input type="hidden" name="payload" value={payload} />
 
       <section className="flex flex-col gap-4">
         <h2 className="text-lg font-semibold">Informations</h2>
+        <PhotoField
+          previewUrl={photoPreviewUrl}
+          isProcessing={isPhotoProcessing}
+          error={photoError ?? fieldErrors.photo}
+          onSelectFile={selectPhoto}
+          onRemove={removePhoto}
+        />
         <FormField id="name" label="Nom" error={fieldErrors.name}>
           <Input
             id="name"
@@ -158,7 +242,7 @@ export const PlantForm = ({ action, initialValues, cancelHref, submitLabel }: Pl
           <Link href={cancelHref} className={buttonVariants({ variant: "ghost" })}>
             Annuler
           </Link>
-          <Button type="submit" disabled={isPending}>
+          <Button type="submit" disabled={isPending || isPhotoProcessing}>
             {isPending ? "Enregistrement…" : submitLabel}
           </Button>
         </div>

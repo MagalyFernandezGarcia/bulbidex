@@ -1,10 +1,12 @@
 import { MapPin, Search, Sprout } from "lucide-react";
+import Image from "next/image";
 import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { getPlants } from "@/lib/data/plants";
+import { getThumbnailUrl } from "@/lib/photo-paths";
 import { isTaskDueNow } from "@/lib/task-status";
 
 type PlantListProps = {
@@ -53,8 +55,18 @@ export const PlantList = async ({ searchParams }: PlantListProps) => {
                 <Link href={`/plants/${plant.id}`} className="block h-full">
                   <Card className="h-full transition-colors hover:bg-muted/50">
                     <CardContent className="flex items-start gap-3">
-                      <div className="flex size-12 shrink-0 items-center justify-center rounded-lg bg-green-50 text-green-700">
-                        <Sprout className="size-6" />
+                      <div className="relative flex size-14 shrink-0 items-center justify-center overflow-hidden rounded-lg bg-green-50 text-green-700">
+                        {plant.photoPath ? (
+                          <Image
+                            src={getThumbnailUrl(plant.photoPath)}
+                            alt=""
+                            fill
+                            unoptimized
+                            className="object-cover"
+                          />
+                        ) : (
+                          <Sprout className="size-6" />
+                        )}
                       </div>
                       <div className="flex min-w-0 flex-1 flex-col gap-1">
                         <div className="flex items-start justify-between gap-2">

@@ -1,4 +1,5 @@
 import { ArrowLeft, CalendarDays, Pencil, Sprout } from "lucide-react";
+import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { deletePlant } from "@/actions/plants";
@@ -6,6 +7,8 @@ import { CareTaskCard } from "@/components/care-task-card";
 import { DeletePlantButton } from "@/components/delete-plant-button";
 import { buttonVariants } from "@/components/ui/button";
 import { getPlant } from "@/lib/data/plants";
+import { getPhotoUrl } from "@/lib/photo-paths";
+import { cn } from "@/lib/utils";
 
 type PlantDetailsProps = {
   params: Promise<{ id: string }>;
@@ -34,8 +37,24 @@ export const PlantDetails = async ({ params }: PlantDetailsProps) => {
       </Link>
 
       <div className="flex flex-col gap-4 sm:flex-row sm:items-start">
-        <div className="flex size-24 shrink-0 items-center justify-center rounded-xl bg-green-50 text-green-700">
-          <Sprout className="size-10" />
+        <div
+          className={cn(
+            "relative flex shrink-0 items-center justify-center overflow-hidden rounded-xl bg-green-50 text-green-700",
+            plant.photoPath ? "aspect-square w-full sm:size-48" : "size-24",
+          )}
+        >
+          {plant.photoPath ? (
+            <Image
+              src={getPhotoUrl(plant.photoPath)}
+              alt={`Photo de ${plant.name}`}
+              fill
+              unoptimized
+              priority
+              className="object-cover"
+            />
+          ) : (
+            <Sprout className="size-10" />
+          )}
         </div>
         <div className="flex flex-1 flex-col gap-1">
           <h1 className="text-2xl font-semibold tracking-tight">{plant.name}</h1>

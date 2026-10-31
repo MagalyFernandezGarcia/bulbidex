@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import { savePlant } from "@/actions/plants";
 import { PlantForm } from "@/components/plant-form";
 import { getPlant } from "@/lib/data/plants";
+import { getPhotoUrl } from "@/lib/photo-paths";
 
 type EditPlantFormProps = {
   params: Promise<{ id: string }>;
@@ -36,6 +37,7 @@ export const EditPlantForm = async ({ params }: EditPlantFormProps) => {
           interval: task.interval,
         })),
       }}
+      initialPhotoUrl={plant.photoPath ? getPhotoUrl(plant.photoPath) : null}
       cancelHref={`/plants/${plant.id}`}
       submitLabel="Enregistrer"
     />
