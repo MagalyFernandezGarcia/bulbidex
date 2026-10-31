@@ -13,12 +13,12 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Bulbidex",
-  description: "Bulbidex",
+  title: { default: "Bulbidex", template: "%s · Bulbidex" },
+  description: "Le carnet d'entretien de mon jardin",
 };
 
 const RootLayout = ({ children }: LayoutProps<"/">) => (
-  <html lang="en" className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}>
+  <html lang="fr" className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}>
     <body className="flex min-h-full flex-col">{children}</body>
   </html>
 );
