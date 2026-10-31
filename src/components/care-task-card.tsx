@@ -3,13 +3,7 @@ import { Recurrence, TaskType } from "@/generated/prisma/enums";
 import { TaskTypeBadge } from "@/components/task-type-badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { createDate, getOccurrencesInRange } from "@/lib/care-schedule";
-import {
-  formatDateRange,
-  formatDayMonth,
-  formatPeriod,
-  formatRecurrence,
-  getTaskTitle,
-} from "@/lib/labels";
+import { formatDateRange, formatDayMonth, formatPeriod, formatRecurrence } from "@/lib/labels";
 import { getCurrentOccurrence, isOccurrenceDone, TaskWithCompletions } from "@/lib/task-status";
 import { cn } from "@/lib/utils";
 
@@ -32,7 +26,7 @@ export const CareTaskCard = ({ task, today }: CareTaskCardProps) => {
       <CardContent className="flex flex-col gap-3">
         <div className="flex flex-wrap items-center gap-2">
           <TaskTypeBadge type={task.type} />
-          <p className="font-medium">{getTaskTitle(task)}</p>
+          {task.title && <p className="font-medium">{task.title}</p>}
         </div>
         <p className="flex flex-wrap items-center gap-x-2 text-sm text-muted-foreground">
           <span className="first-letter:uppercase">{formatPeriod(task)}</span>

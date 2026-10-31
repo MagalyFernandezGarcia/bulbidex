@@ -1,7 +1,9 @@
-import { ArrowLeft, CalendarDays, Sprout } from "lucide-react";
+import { ArrowLeft, CalendarDays, Pencil, Sprout } from "lucide-react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { deletePlant } from "@/actions/plants";
 import { CareTaskCard } from "@/components/care-task-card";
+import { DeletePlantButton } from "@/components/delete-plant-button";
 import { buttonVariants } from "@/components/ui/button";
 import { getPlant } from "@/lib/data/plants";
 
@@ -39,6 +41,9 @@ export const PlantDetails = async ({ params }: PlantDetailsProps) => {
           <h1 className="text-2xl font-semibold tracking-tight">{plant.name}</h1>
           {plant.variety && <p className="text-muted-foreground">{plant.variety}</p>}
         </div>
+      </div>
+
+      <div className="flex flex-wrap gap-2">
         <Link
           href={`/calendar?plant=${plant.id}`}
           className={buttonVariants({ variant: "outline" })}
@@ -46,6 +51,11 @@ export const PlantDetails = async ({ params }: PlantDetailsProps) => {
           <CalendarDays />
           Voir dans le calendrier
         </Link>
+        <Link href={`/plants/${plant.id}/edit`} className={buttonVariants({ variant: "outline" })}>
+          <Pencil />
+          Modifier
+        </Link>
+        <DeletePlantButton plantName={plant.name} deleteAction={deletePlant.bind(null, plant.id)} />
       </div>
 
       {informations.length > 0 && (
