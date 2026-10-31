@@ -16,6 +16,7 @@
     "db:generate": "prisma generate",
     "db:migrate": "prisma migrate dev",
     "db:deploy": "prisma migrate deploy",
+    "db:seed": "prisma db seed",
     "db:studio": "prisma studio",
     "vercel-build": "prisma migrate deploy && next build"
   },
@@ -46,6 +47,7 @@
     "prettier-plugin-tailwindcss": "^0.8.1",
     "prisma": "7.10.1",
     "tailwindcss": "^4",
+    "tsx": "^4.23.15",
     "typescript": "^5"
   },
   "packageManager": "pnpm@10.34.5",

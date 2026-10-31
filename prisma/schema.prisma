@@ -6,3 +6,72 @@ generator client {
 datasource db {
   provider = "postgresql"
 }
+
+enum TaskType {
+  PRUNING
+  FERTILIZING
+  SOWING
+  PLANTING
+  HARVESTING
+  WATERING
+  MULCHING
+  TREATMENT
+  OTHER
+}
+
+enum MonthPart {
+  EARLY
+  MID
+  LATE
+}
+
+enum Recurrence {
+  ONCE
+  EVERY_DAYS
+  EVERY_WEEKS
+}
+
+model Plant {
+  id          String     @id @default(cuid())
+  name        String
+  variety     String?
+  location    String?
+  sunExposure String?
+  soil        String?
+  watering    String?
+  notes       String?
+  photoPath   String?
+  careTasks   CareTask[]
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+}
+
+model CareTask {
+  id           String           @id @default(cuid())
+  plantId      String
+  plant        Plant            @relation(fields: [plantId], references: [id], onDelete: Cascade)
+  type         TaskType
+  title        String?
+  instructions String?
+  startMonth   Int
+  startPart    MonthPart
+  endMonth     Int
+  endPart      MonthPart
+  recurrence   Recurrence       @default(ONCE)
+  interval     Int?
+  completions  TaskCompletion[]
+  createdAt    DateTime         @default(now())
+  updatedAt    DateTime         @updatedAt
+
+  @@index([plantId])
+}
+
+model TaskCompletion {
+  id         String   @id @default(cuid())
+  careTaskId String
+  careTask   CareTask @relation(fields: [careTaskId], references: [id], onDelete: Cascade)
+  dueDate    DateTime @db.Date
+  doneAt     DateTime @default(now())
+
+  @@unique([careTaskId, dueDate])
+}
