@@ -10,6 +10,8 @@ jobs:
     runs-on: ubuntu-latest
     env:
       DATABASE_URL: postgresql://user:password@localhost:5432/bulbidex
+      APP_PASSWORD: ci-password
+      SESSION_SECRET: ci-session-secret-of-at-least-32-characters
     steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v4
