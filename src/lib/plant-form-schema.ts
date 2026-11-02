@@ -49,4 +49,5 @@ export const plantFormSchema = z.object({
 });
 
 export type PlantFormInput = z.input<typeof plantFormSchema>;
+export type PlantFormOutput = z.output<typeof plantFormSchema>;
 export type CareTaskFormInput = z.input<typeof careTaskFormSchema>;
