@@ -5,6 +5,7 @@ import { z } from "zod";
 import { Prisma } from "@/generated/prisma/client";
 import { MonthPart, Recurrence, TaskType } from "@/generated/prisma/enums";
 import { toFieldErrors } from "@/lib/form-errors";
+import { errorResult, textResult } from "@/lib/mcp/tool-results";
 import { careTaskFormSchema, plantFormSchema } from "@/lib/plant-form-schema";
 import { prisma } from "@/lib/prisma";
 
@@ -70,25 +71,6 @@ const toCareTaskFormInput = (task: CareTaskInput) => ({
   title: task.title ?? "",
   instructions: task.instructions ?? "",
   interval: task.interval ?? null,
-});
-
-type ToolResult = {
-  content: { type: "text"; text: string }[];
-  isError?: boolean;
-};
-
-const textResult = (value: unknown): ToolResult => ({
-  content: [{ type: "text", text: JSON.stringify(value, null, 2) }],
-});
-
-const errorResult = (message: string, details?: Record<string, string>): ToolResult => ({
-  content: [
-    {
-      type: "text",
-      text: details ? `${message}\n${JSON.stringify(details, null, 2)}` : message,
-    },
-  ],
-  isError: true,
 });
 
 const careTaskSelect = {
