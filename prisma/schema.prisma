@@ -75,3 +75,11 @@ model TaskCompletion {
 
   @@unique([careTaskId, dueDate])
 }
+
+model GardenTool {
+  id        String   @id @default(cuid())
+  name      String
+  notes     String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
